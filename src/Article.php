@@ -7,7 +7,7 @@
 /**
  * Class Article
  *
- * @Entity
+ * @Entity(repositoryClass="ArticleRepository")
  * @Table(name="article")
  */
 class Article
@@ -34,6 +34,28 @@ class Article
      * @Column(type="text")
      */
     protected $content;
+
+    /**
+     * @var User
+     *
+     * @ManyToOne(targetEntity="User", inversedBy="articles")
+     */
+    protected $author;
+
+    /**
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     *
+     * @ManyToMany(targetEntity="Category", inversedBy="articles")
+     */
+    protected $categories;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     /**
      * @param string $content
@@ -74,4 +96,61 @@ class Article
     {
         return $this->title;
     }
-} 
+
+    /**
+     * Set author
+     *
+     * @param \User $author
+     * @return Article
+     */
+    public function setAuthor(\User $author = null)
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    /**
+     * Get author
+     *
+     * @return \User 
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * Add categories
+     *
+     * @param \Category $category
+     * @return Article
+     */
+    public function addCategory(\Category $category)
+    {
+        $this->categories[] = $category;
+        $category->addArticle($this);
+
+        return $this;
+    }
+
+    /**
+     * Remove categories
+     *
+     * @param \Category $category
+     */
+    public function removeCategory(\Category $category)
+    {
+        $this->categories->removeElement($category);
+    }
+
+    /**
+     * Get categories
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCategories()
+    {
+        return $this->categories;
+    }
+}
